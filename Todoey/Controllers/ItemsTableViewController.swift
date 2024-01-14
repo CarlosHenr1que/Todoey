@@ -6,22 +6,25 @@
 //
 
 import UIKit
-
-class Item {
-    var title: String
-    var done: Bool
-    
-    init(title: String, done: Bool) {
-        self.title = title
-        self.done = done
-    }
-}
+import CoreData
 
 class ItemsTableViewController: UITableViewController {
-    var items = [Item(title: "Buy some coffee", done: true)]
+    var items = [Item]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadItems()
+    }
+    
+    func loadItems() {
+        let request = Item.fetchRequest()
+        do {
+            items = try context.fetch(request)
+            tableView.reloadData()
+        } catch {
+            print("Error while fething items")
+        }
     }
     
     func createAddItemAlert() -> UIAlertController {
@@ -31,7 +34,9 @@ class ItemsTableViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             if let safeTitle = textField.text {
                 if(!safeTitle.isEmpty) {
-                    let newItem = Item(title: safeTitle, done: false)
+                    let newItem = Item(context: self.context)
+                    newItem.title = textField.text
+                    newItem.done = false
                     self.items.append(newItem)
                     self.tableView.reloadData()
                 }
