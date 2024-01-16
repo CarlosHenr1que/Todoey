@@ -12,19 +12,33 @@ class ItemsTableViewController: UITableViewController {
     var items = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        loadItems()
+    var selectedCategory : Category? {
+        didSet{
+            loadItems()
+        }
     }
     
-    func loadItems() {
-        let request = Item.fetchRequest()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let addtionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+        
         do {
             items = try context.fetch(request)
-            tableView.reloadData()
         } catch {
-            print("Error while fething items")
+            print("Error fetching data from context \(error)")
         }
+        
+        tableView.reloadData()
+        
     }
     
     func createAddItemAlert() -> UIAlertController {
@@ -37,8 +51,9 @@ class ItemsTableViewController: UITableViewController {
                     let newItem = Item(context: self.context)
                     newItem.title = textField.text
                     newItem.done = false
+                    newItem.parentCategory = self.selectedCategory
                     self.items.append(newItem)
-                    self.tableView.reloadData()
+                    self.saveItems()
                 }
 
             }
@@ -51,6 +66,16 @@ class ItemsTableViewController: UITableViewController {
         
         alert.addAction(action)
         return alert
+    }
+    
+    func saveItems() {
+        do {
+          try context.save()
+        } catch {
+           print("Error saving context \(error)")
+        }
+        
+        self.tableView.reloadData()
     }
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {

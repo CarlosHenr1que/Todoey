@@ -14,6 +14,7 @@
 		E52D1A3D2B52D16800818993 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E52D1A3B2B52D16800818993 /* LaunchScreen.storyboard */; };
 		E52D1A462B52D28C00818993 /* ItemsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E52D1A452B52D28C00818993 /* ItemsTableViewController.swift */; };
 		E52D1A6F2B52F04A00818993 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E52D1A6D2B52F04A00818993 /* DataModel.xcdatamodeld */; };
+		E5C48BF42B54992500623A4E /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C48BF32B54992500623A4E /* CategoriesViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		E52D1A3E2B52D16800818993 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E52D1A452B52D28C00818993 /* ItemsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsTableViewController.swift; sourceTree = "<group>"; };
 		E52D1A6E2B52F04A00818993 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		E5C48BF32B54992500623A4E /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				E52D1A452B52D28C00818993 /* ItemsTableViewController.swift */,
+				E5C48BF32B54992500623A4E /* CategoriesViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				E52D1A6F2B52F04A00818993 /* DataModel.xcdatamodeld in Sources */,
 				E52D1A332B52D16700818993 /* SceneDelegate.swift in Sources */,
 				E52D1A462B52D28C00818993 /* ItemsTableViewController.swift in Sources */,
+				E5C48BF42B54992500623A4E /* CategoriesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

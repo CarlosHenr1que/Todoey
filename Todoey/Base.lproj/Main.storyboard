@@ -8,6 +8,45 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Categories-->
+        <scene sceneID="stX-n3-LcZ">
+            <objects>
+                <tableViewController id="dYI-wU-6rx" customClass="CategoriesViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="a9y-qr-qXv">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CategoryReusableCell" id="yPk-FS-UIb">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="yPk-FS-UIb" id="Z6O-Kw-4in">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="dYI-wU-6rx" id="DdN-J5-466"/>
+                            <outlet property="delegate" destination="dYI-wU-6rx" id="O33-gz-3TS"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Categories" id="mTJ-KX-udl">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="uIa-9l-R9W">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="dYI-wU-6rx" id="S64-7A-Sxu"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <segue destination="XBV-ZO-aB5" kind="show" identifier="goToItems" id="Qhr-KY-hIJ"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dT7-dS-rbH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2181" y="-113"/>
+        </scene>
         <!--Items-->
         <scene sceneID="M5s-H4-sRd">
             <objects>
@@ -64,12 +103,12 @@
                         </navigationBarAppearance>
                     </navigationBar>
                     <connections>
-                        <segue destination="XBV-ZO-aB5" kind="relationship" relationship="rootViewController" id="NDc-v9-opi"/>
+                        <segue destination="dYI-wU-6rx" kind="relationship" relationship="rootViewController" id="up1-kP-PIK"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tbU-1F-85S" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2324" y="-113"/>
+            <point key="canvasLocation" x="-3011" y="-113"/>
         </scene>
     </scenes>
     <resources>
