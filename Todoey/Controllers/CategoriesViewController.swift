@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwipeCellKit
 
 class CategoriesViewController: UITableViewController {
     var categories = [Category]()
@@ -71,9 +72,11 @@ class CategoriesViewController: UITableViewController {
     }
        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryReusableCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryReusableCell", for: indexPath) as! SwipeTableViewCell
+        cell.delegate = self
         let currentItem = categories[indexPath.row]
         cell.textLabel?.text = currentItem.name
+    
         return cell
     }
     
@@ -88,4 +91,18 @@ class CategoriesViewController: UITableViewController {
         }
     }
 
+}
+
+extension CategoriesViewController: SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeCellKit.SwipeActionsOrientation) -> [SwipeCellKit.SwipeAction]? {
+        guard orientation == .right else { return nil }
+        let deleteAction = SwipeAction(style: .default, title: "Delete", handler: {action, indexPath in
+            self.context.delete(self.categories[indexPath.row])
+            self.categories.remove(at: indexPath.row)
+            self.saveCategories()
+            
+        })
+        
+        return [deleteAction]
+    }
 }
