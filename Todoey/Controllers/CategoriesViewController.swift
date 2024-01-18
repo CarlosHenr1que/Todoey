@@ -8,7 +8,7 @@
 import UIKit
 import SwipeCellKit
 
-class CategoriesViewController: UITableViewController {
+class CategoriesViewController: SwipeTableViewController {
     var categories = [Category]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
@@ -17,7 +17,7 @@ class CategoriesViewController: UITableViewController {
         super.viewDidLoad()
         loadItems()
     }
-    
+       
     func createAddItemAlert() -> UIAlertController {
         var textField = UITextField()
         let alert = UIAlertController(title: "Add new category", message: "", preferredStyle: .alert)
@@ -66,14 +66,19 @@ class CategoriesViewController: UITableViewController {
         }
         tableView.reloadData()
     }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        self.context.delete(self.categories[indexPath.row])
+        self.categories.remove(at: indexPath.row)
+        self.saveCategories()
+    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return categories.count
     }
        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryReusableCell", for: indexPath) as! SwipeTableViewCell
-        cell.delegate = self
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let currentItem = categories[indexPath.row]
         cell.textLabel?.text = currentItem.name
     
@@ -91,18 +96,4 @@ class CategoriesViewController: UITableViewController {
         }
     }
 
-}
-
-extension CategoriesViewController: SwipeTableViewCellDelegate {
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeCellKit.SwipeActionsOrientation) -> [SwipeCellKit.SwipeAction]? {
-        guard orientation == .right else { return nil }
-        let deleteAction = SwipeAction(style: .default, title: "Delete", handler: {action, indexPath in
-            self.context.delete(self.categories[indexPath.row])
-            self.categories.remove(at: indexPath.row)
-            self.saveCategories()
-            
-        })
-        
-        return [deleteAction]
-    }
 }
