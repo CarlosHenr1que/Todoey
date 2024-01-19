@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class ItemsTableViewController: UITableViewController {
+class ItemsTableViewController: SwipeTableViewController {
     var items = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
@@ -87,7 +87,7 @@ class ItemsTableViewController: UITableViewController {
     }
        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ItemsReusableCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let currentItem = items[indexPath.row]
         cell.textLabel?.text = currentItem.title
         cell.accessoryType = currentItem.done ? .checkmark : .none
@@ -100,5 +100,11 @@ class ItemsTableViewController: UITableViewController {
         currentItem.done = !currentItem.done
         currentCell?.accessoryType = currentItem.done ? .checkmark : .none
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        context.delete(items[indexPath.row])
+        items.remove(at: indexPath.row)
+        saveItems()
     }
 }
