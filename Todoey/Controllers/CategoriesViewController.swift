@@ -7,6 +7,7 @@
 
 import UIKit
 import SwipeCellKit
+import ChameleonFramework
 
 class CategoriesViewController: SwipeTableViewController {
     var categories = [Category]()
@@ -16,6 +17,7 @@ class CategoriesViewController: SwipeTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadItems()
+        tableView.separatorStyle = .none
     }
        
     func createAddItemAlert() -> UIAlertController {
@@ -27,6 +29,7 @@ class CategoriesViewController: SwipeTableViewController {
                 if(!safeTitle.isEmpty) {
                     let newCategory = Category(context: self.context)
                     newCategory.name = textField.text
+                    newCategory.color = UIColor.randomFlat().hexValue()
                     self.categories.append(newCategory)
                     self.saveCategories()
                     self.tableView.reloadData()
@@ -81,7 +84,7 @@ class CategoriesViewController: SwipeTableViewController {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let currentItem = categories[indexPath.row]
         cell.textLabel?.text = currentItem.name
-    
+        cell.backgroundColor = UIColor(hexString: currentItem.color!)
         return cell
     }
     
