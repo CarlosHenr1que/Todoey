@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import ChameleonFramework
 
 class ItemsTableViewController: SwipeTableViewController {
     var items = [Item]()
@@ -91,6 +92,12 @@ class ItemsTableViewController: SwipeTableViewController {
         let currentItem = items[indexPath.row]
         cell.textLabel?.text = currentItem.title
         cell.accessoryType = currentItem.done ? .checkmark : .none
+        
+        if let color = UIColor(hexString: selectedCategory!.color!)!.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(items.count)) {
+            cell.backgroundColor = color
+            cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+        }
+        
         return cell
     }
     
