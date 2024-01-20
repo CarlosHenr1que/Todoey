@@ -4,8 +4,9 @@
 target 'Todoey' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-pod 'SwipeCellKit'
 
+  pod 'SwipeCellKit'
+  pod 'ChameleonFramework/Swift', :git => 'https://github.com/wowansm/Chameleon.git', :branch => 'swift5'
   # Pods for Todoey
 
 end
