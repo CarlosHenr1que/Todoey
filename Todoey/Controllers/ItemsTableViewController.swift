@@ -21,6 +21,28 @@ class ItemsTableViewController: SwipeTableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = selectedCategory?.name!
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        let backgroundColor = UIColor(hexString: selectedCategory!.color!)!
+        navigationController?.navigationBar.backgroundColor = backgroundColor
+        setStatusBarColor(backgroundColor)
+    }
+    
+    func setStatusBarColor(_ color: UIColor) {
+        if #available(iOS 13.0, *) {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = windowScene.windows.first else {
+                return
+            }
+            
+            let statusBar = UIView(frame: windowScene.statusBarManager?.statusBarFrame ?? CGRect.zero)
+            statusBar.backgroundColor = color
+            window.addSubview(statusBar)
+        } else {
+            UIApplication.shared.statusBarStyle = preferredStatusBarStyle
+        }
     }
     
     func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
