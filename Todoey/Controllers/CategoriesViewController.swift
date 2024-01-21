@@ -100,12 +100,14 @@ class CategoriesViewController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return categories.count
     }
-       
+           
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let currentItem = categories[indexPath.row]
         cell.textLabel?.text = currentItem.name
-        cell.backgroundColor = UIColor(hexString: currentItem.color!)
+        let color = UIColor(hexString: currentItem.color!)!
+        cell.backgroundColor = color
+        cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
         return cell
     }
     
@@ -117,6 +119,7 @@ class CategoriesViewController: SwipeTableViewController {
         let destination = segue.destination as! ItemsTableViewController
         if let indexPath = tableView.indexPathForSelectedRow {
             destination.selectedCategory = categories[indexPath.row]
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
 
