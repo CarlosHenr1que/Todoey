@@ -8,10 +8,11 @@
 import UIKit
 import CoreData
 import ChameleonFramework
+import RealmSwift
 
 class ItemsTableViewController: SwipeTableViewController {
-    var items = [Item]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var items: Results<Item>?
+    var realm = try! Realm()
     
     var selectedCategory : Category? {
         didSet{
@@ -21,11 +22,11 @@ class ItemsTableViewController: SwipeTableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = selectedCategory?.name!
+        title = selectedCategory?.name
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let backgroundColor = UIColor(hexString: selectedCategory!.color!)!
+        let backgroundColor = UIColor(hexString: selectedCategory!.color)!
         navigationController?.navigationBar.backgroundColor = backgroundColor
         setStatusBarColor(backgroundColor)
     }
@@ -45,21 +46,8 @@ class ItemsTableViewController: SwipeTableViewController {
         }
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-        if let addtionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
-        } else {
-            request.predicate = categoryPredicate
-        }
-        
-        do {
-            items = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        
+    func loadItems() {
+        items = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
         
     }
@@ -71,12 +59,17 @@ class ItemsTableViewController: SwipeTableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             if let safeTitle = textField.text {
                 if(!safeTitle.isEmpty) {
-                    let newItem = Item(context: self.context)
-                    newItem.title = textField.text
-                    newItem.done = false
-                    newItem.parentCategory = self.selectedCategory
-                    self.items.append(newItem)
-                    self.saveItems()
+                    do {
+                        try self.realm.write {
+                            let newItem = Item()
+                            newItem.title = textField.text!
+                            newItem.done = false
+                            self.selectedCategory?.items.append(newItem)
+                        }
+                    } catch {
+                        print("Error saving new items, \(error)")
+                    }
+                    self.tableView.reloadData()
                 }
 
             }
@@ -90,32 +83,22 @@ class ItemsTableViewController: SwipeTableViewController {
         alert.addAction(action)
         return alert
     }
-    
-    func saveItems() {
-        do {
-          try context.save()
-        } catch {
-           print("Error saving context \(error)")
-        }
         
-        self.tableView.reloadData()
-    }
-    
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         present(createAddItemAlert(), animated: true)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return items?.count ?? 0
     }
        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        let currentItem = items[indexPath.row]
+        let currentItem = items![indexPath.row]
         cell.textLabel?.text = currentItem.title
         cell.accessoryType = currentItem.done ? .checkmark : .none
         
-        if let color = UIColor(hexString: selectedCategory!.color!)!.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(items.count)) {
+        if let color = UIColor(hexString: selectedCategory!.color)!.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(items!.count)) {
             cell.backgroundColor = color
             cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
         }
@@ -124,7 +107,7 @@ class ItemsTableViewController: SwipeTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let currentItem = items[indexPath.row]
+        let currentItem = items![indexPath.row]
         let currentCell = tableView.cellForRow(at: indexPath)
         currentItem.done = !currentItem.done
         currentCell?.accessoryType = currentItem.done ? .checkmark : .none
@@ -132,8 +115,14 @@ class ItemsTableViewController: SwipeTableViewController {
     }
     
     override func updateModel(at indexPath: IndexPath) {
-        context.delete(items[indexPath.row])
-        items.remove(at: indexPath.row)
-        saveItems()
+        let currentItem = items![indexPath.row]
+        do {
+            try realm.write {
+                realm.delete(currentItem)
+            }
+        } catch {
+            print("Error while deleting item")
+        }
+        tableView.reloadData()
     }
 }

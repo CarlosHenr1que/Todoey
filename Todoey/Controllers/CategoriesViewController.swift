@@ -8,16 +8,18 @@
 import UIKit
 import SwipeCellKit
 import ChameleonFramework
+import RealmSwift
 
 class CategoriesViewController: SwipeTableViewController {
-    var categories = [Category]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var categories: Results<Category>?
+    let realm = try! Realm()
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
         loadItems()
         tableView.separatorStyle = .none
+        print(Realm.Configuration.defaultConfiguration.fileURL)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -48,11 +50,10 @@ class CategoriesViewController: SwipeTableViewController {
         let action = UIAlertAction(title: "Add category", style: .default) { (action) in
             if let safeTitle = textField.text {
                 if(!safeTitle.isEmpty) {
-                    let newCategory = Category(context: self.context)
-                    newCategory.name = textField.text
+                    let newCategory = Category()
+                    newCategory.name = textField.text!
                     newCategory.color = UIColor.randomFlat().hexValue()
-                    self.categories.append(newCategory)
-                    self.saveCategories()
+                    self.saveCategories(category: newCategory)
                     self.tableView.reloadData()
                 }
 
@@ -69,22 +70,19 @@ class CategoriesViewController: SwipeTableViewController {
     }
     
     func loadItems() {
-        let request = Category.fetchRequest()
-        do {
-            categories = try context.fetch(request)
-            tableView.reloadData()
-        } catch {
-            print("Error while fething categories")
-        }
+        categories = realm.objects(Category.self)
+        tableView.reloadData()
     }
 
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         present(createAddItemAlert(), animated: true)
     }
     
-    func saveCategories() {
+    func saveCategories(category: Category) {
         do {
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         } catch {
             print("Error saving category \(error)")
         }
@@ -92,20 +90,27 @@ class CategoriesViewController: SwipeTableViewController {
     }
     
     override func updateModel(at indexPath: IndexPath) {
-        self.context.delete(self.categories[indexPath.row])
-        self.categories.remove(at: indexPath.row)
-        self.saveCategories()
+        if let currentCategory = categories?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(currentCategory)
+                }
+                tableView.reloadData()
+            } catch {
+                print("Error deleting category")
+            }
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        return categories?.count ?? 0
     }
            
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        let currentItem = categories[indexPath.row]
+        let currentItem = categories![indexPath.row]
         cell.textLabel?.text = currentItem.name
-        let color = UIColor(hexString: currentItem.color!)!
+        let color = UIColor(hexString: currentItem.color)!
         cell.backgroundColor = color
         cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
         return cell
@@ -118,7 +123,7 @@ class CategoriesViewController: SwipeTableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destination = segue.destination as! ItemsTableViewController
         if let indexPath = tableView.indexPathForSelectedRow {
-            destination.selectedCategory = categories[indexPath.row]
+            destination.selectedCategory = categories![indexPath.row]
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
